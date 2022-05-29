@@ -1,3 +1,18 @@
+# Circuit.io
+
+## Links Interessantes
+
+### Libs
+ - [Lottie](https://airbnb.design/lottie/) Animações do after effects para csv.
+
+ - [React Konva](https://github.com/konvajs/react-konva) Renderizar graficos no `<canvas>`.
+
+
+ - [React Canvas](https://github.com/flipboard/react-canvas) Renderizar Elementos do DOM no `<canvas>` ao invés do DOM
+
+---
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

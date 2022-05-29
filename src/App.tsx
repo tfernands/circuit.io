@@ -1,24 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { Circle, Layer, Stage } from 'react-konva';
 
-function App() {
+function MyCircle() {
+
+  const [color, setColor] = useState("green");
+
+  return (
+    <Circle
+      x={200}
+      y={100}
+      radius={50}
+      fill={color}
+      onTouchStart={e=>{setColor('blue')}}
+      onTouchEnd={e=>{setColor('green')}}
+      onDragEnd={e=>{setColor('green')}}
+      onMouseLeave={e=>{setColor('green')}}
+      onMouseEnter={e=>{setColor('red')}}
+      draggable
+    />
+  );
+}
+
+
+function App(): React.ReactElement {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Stage width={window.innerWidth} height={window.innerHeight}>
+        <Layer >
+          <MyCircle/>
+          <MyCircle/>
+        </Layer>
+      </Stage>
     </div>
   );
 }
