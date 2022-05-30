@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Konva from 'konva';
-import { Circle, KonvaNodeComponent, KonvaNodeEvents, Layer, Stage, StageProps } from 'react-konva';
+import { Circle, KonvaNodeComponent, KonvaNodeEvents, Layer, Stage, StageProps, Text } from 'react-konva';
 import { KonvaNodeEvent } from 'konva/lib/types';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vec2 } from './util/Vec2';
@@ -29,35 +29,35 @@ function MyCircle() {
 }
 
 function App(): React.ReactElement {
-
-  const stage = useRef<Konva.Stage>(null)
+  const [text, setText] = useState('Teste');
+  const layer = useRef<Konva.Layer>(null)
 
   const zoomWheel = (e: KonvaEventObject<WheelEvent>)=>{
     e.evt.preventDefault();
     if (e.evt.deltaY.toString().length > 10) {
       const scaleBy = 1-e.evt.deltaY*0.01;
-      const oldScale = stage.current?.scaleX();
-      const pointer = stage.current?.getPointerPosition();
-      if (stage.current && pointer && oldScale){
+      const oldScale = layer.current?.scaleX();
+      const pointer = layer.current?.getRelativePointerPosition();
+      if (layer.current && pointer && oldScale){
         const mousePointTo = {
-          x: (pointer.x - stage.current.x())/oldScale,
-          y: (pointer.y - stage.current.y())/oldScale
+          x: (pointer.x - layer.current.x())/oldScale,
+          y: (pointer.y - layer.current.y())/oldScale
         }
         let direction = e.evt.deltaY > 0 ? 1 : -1;
         if (e.evt.ctrlKey){
           direction = -direction;
         }
         const newScale = oldScale * scaleBy;
-        stage.current.scale({x: newScale, y: newScale});
+        layer.current.scale({x: newScale, y: newScale});
         const newPos = {
           x: pointer.x - mousePointTo.x * newScale,
           y: pointer.y - mousePointTo.y * newScale
         }
-        stage.current.position(newPos);
+        layer.current.position(newPos);
       }
     }
-    else if (stage.current) {
-      stage.current.position({x:e.evt.deltaX, y:e.evt.deltaY});
+    else if (layer.current) {
+      layer.current.position({x:layer.current.x()-e.evt.deltaX, y:layer.current.y()-e.evt.deltaY});
     }
   }
 
@@ -67,27 +67,26 @@ function App(): React.ReactElement {
   let startDist = 1;
   let startScale = 0;
   const zoomMultTouchStart = (e: KonvaEventObject<TouchEvent>)=>{
-    if (e.evt.touches.length == 2 && stage.current) {
+    if (e.evt.touches.length == 2 && layer.current) {
       const p1 = new Vec2(e.evt.touches[0].clientX, e.evt.touches[0].clientY);
       const p2 = new Vec2(e.evt.touches[1].clientX, e.evt.touches[1].clientY);
       startDist = p1.clone().sub(p2).mag();
       startTouchCenter = p1.add(p2).div(2);
-      startScale = stage.current.scaleX();
-      startPosition = new Vec2(stage.current.x(), stage.current.y());
+      startScale = layer.current.scaleX();
+      startPosition = new Vec2(layer.current.x(), layer.current.y());
     }
   }
   const zoomMultTouchMove = (e: KonvaEventObject<TouchEvent>)=>{
     e.evt.preventDefault();
-    if (e.evt.touches.length == 2 && stage.current && startPosition && startTouchCenter) {
+    if (e.evt.touches.length == 2 && layer.current && startPosition && startTouchCenter) {
       const p1 = new Vec2(e.evt.touches[0].clientX, e.evt.touches[0].clientY);
       const p2 = new Vec2(e.evt.touches[1].clientX, e.evt.touches[1].clientY);
       const scale = p1.clone().sub(p2).mag();
-      const scaleBy = scale/startDist*startScale
-      stage.current.setPosition({x:startPosition.x,y:startPosition.y});
-      stage.current.scale({x:scaleBy,y:scaleBy});
-      const delta = p1.add(p2).div(2).sub(startTouchCenter)
-      const newPos = delta.add(startPosition)
-      stage.current.setPosition({x:newPos.x,y:newPos.y});
+      const mousePointTo = startTouchCenter.sub(layer.current.x(), layer.current.y()).div(startScale);
+      const scaleBy = (1+scale/startDist)*startScale
+      //stage.current.scale({x:scaleBy,y:scaleBy});
+      const pc = p1.clone().sub(mousePointTo).mul(scaleBy);
+      //stage.current.position({x:pc.x,y:pc.y});
     }
     return;
   }
@@ -101,15 +100,17 @@ function App(): React.ReactElement {
     <div className="App">
       <Stage
        width={window.innerWidth} height={window.innerHeight}
-       ref={stage}
        onWheel={zoomWheel}
        onTouchStart={zoomMultTouchStart}
        onTouchMove={zoomMultTouchMove}
        onTouchEnd={zoomMultTouchEnd}
       >
+        <Layer ref={layer}>
+          <MyCircle/>
+          <MyCircle/>
+        </Layer>
         <Layer>
-          <MyCircle/>
-          <MyCircle/>
+          <Text x={20} y={20} text={text} fontSize={18} />
         </Layer>
       </Stage>
     </div>

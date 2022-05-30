@@ -9,15 +9,27 @@ export class Vec2 {
         this.y = y;
     }
 
-    add(v: Vec2): this {
-        this.x += v.x;
-        this.y += v.y;
+    add(v: Vec2 | number, y?: number): this {
+        if (v instanceof Vec2){
+            this.x += v.x;
+            this.y += v.y;
+        }
+        else if (y){
+            this.x += v;
+            this.y += y;
+        }
         return this;
     }
 
-    sub(v: Vec2): this {
-        this.x -= v.x;
-        this.y -= v.y;
+    sub(v: Vec2 | number, y?: number): this {
+        if (v instanceof Vec2){
+            this.x -= v.x;
+            this.y -= v.y;
+        }
+        else if (y){
+            this.x -= v;
+            this.y -= y;
+        }
         return this;
     }
 
