@@ -1,3 +1,4 @@
+const customInspectSymbol = Symbol.for('nodejs.util.inspect.custom');
 
 export class Vec2 {
 
@@ -71,5 +72,13 @@ export class Vec2 {
         const dx = v2.x-v1.x;
         const dy = v2.y-v1.y;
         return Math.sqrt(dx*dx+dy*dy);
+    }
+
+    toString(){
+        return `Vec2(${this.x.toFixed(2)}, ${this.y.toFixed(2)})`;
+    }
+
+    public [customInspectSymbol](depth: any, opts: any, inspect: any): string {
+        return this.toString();
     }
 }
